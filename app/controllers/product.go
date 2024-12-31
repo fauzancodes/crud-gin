@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/fauzancodes/crud-gin/app/dto"
+	"github.com/fauzancodes/crud-gin/app/pkg/utils"
 	"github.com/fauzancodes/crud-gin/app/service"
 	"github.com/gin-gonic/gin"
 )
@@ -16,30 +17,14 @@ func CreateProduct(c *gin.Context) {
 	var request dto.ProductRequest
 	if err := c.Bind(&request); err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			http.StatusUnprocessableEntity,
-			dto.Response{
-				Status:  http.StatusUnprocessableEntity,
-				Message: "Invalid request body",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(http.StatusUnprocessableEntity, utils.MakeHTTPError("Invalid request body", http.StatusUnprocessableEntity, err))
 		return
 	}
 
 	//Validating requests from clients
 	if err := request.Validate(); err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			http.StatusBadRequest,
-			dto.Response{
-				Status:  http.StatusBadRequest,
-				Message: "Invalid request value",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(http.StatusBadRequest, utils.MakeHTTPError("Invalid request value", http.StatusBadRequest, err))
 		return
 	}
 
@@ -47,27 +32,12 @@ func CreateProduct(c *gin.Context) {
 	result, statusCode, err := service.CreateProduct(request)
 	if err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			statusCode,
-			dto.Response{
-				Status:  statusCode,
-				Message: "Failed to create product",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(statusCode, utils.MakeHTTPError("Invalid request value", statusCode, err))
 		return
 	}
 
 	//If the process is successful, the function is complete and will return response data to the client
-	c.JSON(
-		statusCode,
-		dto.Response{
-			Status:  statusCode,
-			Message: "Success to create product",
-			Data:    result,
-		},
-	)
+	c.JSON(statusCode, utils.MakeHTTPResponse("Success to create product", statusCode, result))
 }
 
 func GetProducts(c *gin.Context) {
@@ -78,27 +48,12 @@ func GetProducts(c *gin.Context) {
 	result, statusCode, err := service.GetProducts(search)
 	if err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			statusCode,
-			dto.Response{
-				Status:  statusCode,
-				Message: "Failed to create product",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(statusCode, utils.MakeHTTPError("Failed to get product", statusCode, err))
 		return
 	}
 
 	//If the process is successful, the function is complete and will return response data to the client
-	c.JSON(
-		statusCode,
-		dto.Response{
-			Status:  statusCode,
-			Message: "Success to create product",
-			Data:    result,
-		},
-	)
+	c.JSON(statusCode, utils.MakeHTTPResponse("Success to get product", statusCode, result))
 }
 
 func GetProductByID(c *gin.Context) {
@@ -109,27 +64,12 @@ func GetProductByID(c *gin.Context) {
 	result, statusCode, err := service.GetProductByID(id)
 	if err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			statusCode,
-			dto.Response{
-				Status:  statusCode,
-				Message: "Failed to create product",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(statusCode, utils.MakeHTTPError("Failed to get product", statusCode, err))
 		return
 	}
 
 	//If the process is successful, the function is complete and will return response data to the client
-	c.JSON(
-		statusCode,
-		dto.Response{
-			Status:  statusCode,
-			Message: "Success to create product",
-			Data:    result,
-		},
-	)
+	c.JSON(statusCode, utils.MakeHTTPResponse("Success to get product", statusCode, result))
 }
 
 func UpdateProduct(c *gin.Context) {
@@ -137,15 +77,7 @@ func UpdateProduct(c *gin.Context) {
 	var request dto.ProductRequest
 	if err := c.Bind(&request); err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			http.StatusUnprocessableEntity,
-			dto.Response{
-				Status:  http.StatusUnprocessableEntity,
-				Message: "Invalid request body",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(http.StatusUnprocessableEntity, utils.MakeHTTPError("Invalid request body", http.StatusUnprocessableEntity, err))
 		return
 	}
 
@@ -156,27 +88,12 @@ func UpdateProduct(c *gin.Context) {
 	data, statusCode, err := service.UpdateProduct(id, request)
 	if err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			statusCode,
-			dto.Response{
-				Status:  statusCode,
-				Message: "Failed to update data",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(statusCode, utils.MakeHTTPError("Failed to update data", statusCode, err))
 		return
 	}
 
 	//If the process is successful, the function is complete and will return response data to the client
-	c.JSON(
-		http.StatusOK,
-		dto.Response{
-			Status:  200,
-			Message: "Success to update data",
-			Data:    data,
-		},
-	)
+	c.JSON(statusCode, utils.MakeHTTPResponse("Success to update data", statusCode, data))
 }
 
 func DeleteProduct(c *gin.Context) {
@@ -187,24 +104,10 @@ func DeleteProduct(c *gin.Context) {
 	statusCode, err := service.DeleteProduct(id)
 	if err != nil {
 		//If the process fails, it will return an error
-		c.JSON(
-			statusCode,
-			dto.Response{
-				Status:  statusCode,
-				Message: "Failed to delete data",
-				Error:   err.Error(),
-			},
-		)
-
+		c.JSON(statusCode, utils.MakeHTTPError("Failed to delete data", statusCode, err))
 		return
 	}
 
 	//If the process is successful, the function is complete and will return response data to the client
-	c.JSON(
-		statusCode,
-		dto.Response{
-			Status:  statusCode,
-			Message: "Success to delete data",
-		},
-	)
+	c.JSON(statusCode, utils.MakeHTTPResponse("Success to delete data", statusCode, nil))
 }
