@@ -9,7 +9,8 @@ import (
 	"github.com/fauzancodes/crud-gin/app/config"
 	"github.com/fauzancodes/crud-gin/app/routes"
 	"github.com/gin-gonic/gin"
-	_ "github.com/joho/godotenv/autoload" //This package is used to load environment variables automatically every time the application runs
+	//This package below is used to load environment variables automatically every time the application runs
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
