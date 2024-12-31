@@ -1,7 +1,7 @@
 package routes
 
 //Directory: /app/routes/product.go
-//This file is used to handle all the required routing
+//This file is used to handle all the required routing of this group
 
 import (
 	"github.com/fauzancodes/crud-gin/app/controllers"
