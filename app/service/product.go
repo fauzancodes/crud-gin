@@ -92,42 +92,26 @@ func UpdateProduct(id string, request dto.ProductRequest) (response models.CRUDP
 	parsedUUID, err := uuid.Parse(id)
 	if err != nil {
 		//If the process fails, it will return an error
-		err = errors.New("failed to parse UUID: " + err.Error())
-		statusCode = http.StatusInternalServerError
-		return
+		return response, http.StatusInternalServerError, errors.New("failed to parse UUID: " + err.Error())
 	}
 
 	//Retrieving data from database using ORM
 	data, err := repository.GetProductByID(parsedUUID)
 	if err != nil {
 		//If the process fails, it will return an error
-		err = errors.New("failed to get data: " + err.Error())
 		if err == gorm.ErrRecordNotFound {
-			statusCode = http.StatusNotFound
-			return
+			return response, http.StatusNotFound, errors.New("failed to get data: " + err.Error())
 		}
-
-		statusCode = http.StatusInternalServerError
-		return
+		return response, http.StatusInternalServerError, errors.New("failed to get data: " + err.Error())
 	}
 
-	//Check whether the "Code" field is filled in by the client or whether this field is sent or not by the frontend, if not then the data from the database will not be replaced, if filled in then the data from the database will be replaced with the contents from the client
-	if request.Code != "" {
-		data.Code = request.Code
-	}
-	//Check whether the "Name" field is filled in by the client or whether this field is sent or not by the frontend, if not then the data from the database will not be replaced, if filled in then the data from the database will be replaced with the contents from the client
-	if request.Name != "" {
-		data.Name = request.Name
-	}
-	//Check whether the "Description" field is filled in by the client or whether this field is sent or not by the frontend, if not then the data from the database will not be replaced, if filled in then the data from the database will be replaced with the contents from the client
-	if request.Description != "" {
-		data.Description = request.Description
-	}
+	//Check whether the "Code", "Name", and "Description" fields are filled in by the client, if not then the data from the database will not be replaced, if filled in then the data from the database will be replaced with the contents from the client
+	if request.Code != "" {data.Code = request.Code}
+	if request.Name != "" {data.Name = request.Name}
+	if request.Description != "" {data.Description = request.Description}
 
-	//Because the "Price" can be 0, this field cannot be conditioned to be skipped like the other fields above, therefore, the data from the database will be directly replaced with the contents of the client. Therefore, the frontend must send this field, otherwise it will accidentally delete the value in this field
+	//Because the "Price" can be 0 and the "Status" only has 2 values, true or false, these fields cannot be conditioned to be skipped like the other fields above, therefore, the data from the database will be directly replaced with the contents from the client.
 	data.Price = request.Price
-
-	//Because the "Status" only has 2 values, true or false, this field cannot be conditioned to be skipped like the other fields above, therefore, the data from the database will be directly replaced with the contents of the client. Therefore, the frontend must send this field, otherwise it will accidentally change the value in this field
 	data.Status = request.Status
 
 	//Sending updated data to ORM
